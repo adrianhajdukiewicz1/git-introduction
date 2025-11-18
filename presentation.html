@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurs Git - Wprowadzenie</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+    <style>
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+        .reveal pre { width: 100%; }
+        .reveal code { max-height: 500px; }
+        .two-columns { display: flex; gap: 2rem; }
+        .two-columns > div { flex: 1; }
+        .cheat-sheet { font-size: 0.5em; }
+        .cheat-sheet code { font-size: 0.9em; }
+        .small-text { font-size: 0.8em; }
+        .git-log-output {
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            font-size: 0.7em;
+        }
+        .git-log-output .commit-hash { color: #f9e64f; }
+        .git-log-output .commit-message { color: #ffffff; }
+        .git-log-output .commit-author { color: #569cd6; }
+        .git-log-output .commit-date { color: #4ec9b0; }
+        .git-log-output .branch-head { color: #1aff1a; font-weight: bold; }
+        .git-log-output .branch-remote { color: #ff6b6b; font-weight: bold; }
+        .git-status-output {
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            font-size: 0.65em;
+            color: #cccccc;
+        }
+        .git-status-output .branch-name { color: #1aff1a; font-weight: bold; }
+        .git-status-output .staged { color: #1aff1a; }
+        .git-status-output .modified { color: #ff6b6b; }
+        .git-status-output .untracked { color: #ff6b6b; }
+        .git-status-output .hint { color: #808080; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- Title Slide -->
+            <section>
+                <h1>Kurs Git</h1>
+                <h3>System kontroli wersji</h3>
+                <p>Od podstaw do zaawansowanych technik</p>
+            </section>
+
+            <!-- Module 0: Introduction -->
+            <section>
+                <section>
+                    <h2>Moduł 0: Wprowadzenie</h2>
+                    <p>Dlaczego potrzebujemy Git?</p>
+                </section>
+
+                <section>
+                    <h3>Problem, który Git rozwiązuje</h3>
+                    <ul>
+                        <li>📁 Chaos w wersjach plików: <code>projekt_final.txt</code>, <code>projekt_final_v2.txt</code>, <code>projekt_final_NAPRAWDE_final.txt</code></li>
+                        <li>👥 Praca zespołowa - konflikty przy edycji tego samego pliku</li>
+                        <li>🔄 Brak historii zmian - kto, kiedy i dlaczego coś zmienił?</li>
+                        <li>💾 Trudność w cofaniu się do wcześniejszych wersji</li>
+                        <li>🔀 Niemożność równoległej pracy nad różnymi funkcjonalnościami</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Instalacja Git</h3>
+                    <div class="two-columns">
+                        <div>
+                            <h4>Linux (Ubuntu/Debian)</h4>
+                            <pre><code class="bash">sudo apt-get update
+sudo apt-get install git</code></pre>
+                            <h4>macOS</h4>
+                            <pre><code class="bash">brew install git
+# lub używając Xcode Command Line Tools
+xcode-select --install</code></pre>
+                        </div>
+                        <div>
+                            <h4>Windows</h4>
+                            <p>Pobierz z: <a href="https://git-scm.com">git-scm.com</a></p>
+                            <h4>Weryfikacja</h4>
+                            <pre><code class="bash">git --version</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Konfiguracja globalna</h3>
+                    <p>Pierwsza konfiguracja Git - identyfikacja użytkownika</p>
+                    <pre><code class="bash"># Ustaw swoją nazwę użytkownika
+git config --global user.name "Jan Kowalski"
+
+# Ustaw swój email
+git config --global user.email "jan.kowalski@example.com"
+
+# Sprawdź konfigurację
+git config --list</code></pre>
+                </section>
+
+                <section>
+                    <h3>SSH vs HTTPS</h3>
+                    <div class="two-columns small-text">
+                        <div>
+                            <h4>HTTPS</h4>
+                            <ul>
+                                <li>✅ Łatwiejsza konfiguracja</li>
+                                <li>✅ Działa wszędzie (firewalle)</li>
+                                <li>⚠️ Wymaga logowania (lub tokena)</li>
+                            </ul>
+                            <pre><code class="bash">git clone https://github.com/user/repo.git</code></pre>
+                        </div>
+                        <div>
+                            <h4>SSH</h4>
+                            <ul>
+                                <li>✅ Brak potrzeby logowania</li>
+                                <li>✅ Wygodniejsze dla codziennej pracy</li>
+                                <li>⚠️ Wymaga konfiguracji kluczy</li>
+                            </ul>
+                            <pre><code class="bash">git clone git@github.com:user/repo.git</code></pre>
+                        </div>
+                    </div>
+                    <p class="small-text">Rekomendacja: SSH dla codziennej pracy</p>
+                </section>
+
+                <section>
+                    <h3>Konfiguracja SSH dla GitHub</h3>
+                    <p class="small-text">Plik <code>~/.ssh/config</code> - automatyczne używanie właściwego klucza</p>
+                    <pre><code class="bash"># Utwórz lub edytuj plik ~/.ssh/config
+nano ~/.ssh/config</code></pre>
+                    <pre><code class="plaintext">Host github.com
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_rsa_github</code></pre>
+                    <p class="small-text">💡 <strong>Co to robi:</strong></p>
+                    <ul class="small-text">
+                        <li><code>AddKeysToAgent yes</code> - automatycznie dodaje klucz do ssh-agent</li>
+                        <li><code>UseKeychain yes</code> - przechowuje hasło w macOS Keychain (tylko macOS)</li>
+                        <li><code>IdentityFile</code> - wskazuje który klucz SSH użyć dla GitHub</li>
+                    </ul>
+                    <p class="small-text">🔑 Teraz Git automatycznie użyje tego klucza dla github.com!</p>
+                </section>
+
+                <section style="font-size: 0.7em;">
+                    <h3>Generowanie klucza SSH</h3>
+                    <p class="small-text">Kryptografia asymetryczna - para kluczy: prywatny + publiczny</p>
+                    <div class="two-columns small-text">
+                        <div>
+                            <h4>Generowanie</h4>
+                            <pre><code class="bash"># Wygeneruj parę kluczy SSH
+ssh-keygen -t ed25519 -C "twoj.email@example.com"
+
+# Gdzie zapisać? (Enter = domyślnie)
+# ~/.ssh/id_ed25519
+
+# Ustaw hasło (opcjonalnie, ale zalecane!)
+
+# Utworzone pliki:
+# id_ed25519      - klucz PRYWATNY ⛔
+# id_ed25519.pub  - klucz PUBLICZNY ✅</code></pre>
+                        </div>
+                        <div>
+                            <h4>Dodawanie do GitHub</h4>
+                            <pre><code class="bash"># 1. Skopiuj klucz PUBLICZNY
+cat ~/.ssh/id_ed25519.pub
+
+# 2. GitHub → Settings → SSH Keys
+# 3. Wklej klucz publiczny
+
+# 4. Testuj połączenie
+ssh -T git@github.com</code></pre>
+                        </div>
+                    </div>
+                    <img src="images/keys.png" alt="Asymmetric Cryptography" style="max-width: 50%; margin-top: 1rem;">
+                    <p class="small-text" style="margin-top: 1rem;">⚠️ <strong>NIGDY nie udostępniaj klucza PRYWATNEGO!</strong> Tylko publiczny (.pub) dodajesz do GitHub/GitLab!</p>
+                </section>
+            </section>
+
+            <!-- Module 1: Basic Workflow -->
+            <section>
+                <section>
+                    <h2>Moduł 1: Podstawowy cykl pracy</h2>
+                    <p>Pierwsze kroki z Git</p>
+                </section>
+
+                <section>
+                    <h3>Tworzenie repozytorium</h3>
+                    <div class="two-columns">
+                        <div>
+                            <h4>git init</h4>
+                            <p>Tworzy nowe repo</p>
+                            <pre><code class="bash">mkdir my-project
+cd my-project
+git init</code></pre>
+                        </div>
+                        <div>
+                            <h4>git clone</h4>
+                            <p>Kopiuje istniejące repo</p>
+                            <pre><code class="bash">git clone https://github.com/user/repo.git
+
+# lub z inną nazwą folderu
+git clone https://github.com/user/repo.git my-folder</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Cztery obszary w Git</h3>
+                    <img src="https://git-scm.com/images/about/index1@2x.png" alt="Git Areas" style="max-height: 400px;">
+                    <ol class="small-text">
+                        <li><strong>Working Directory</strong> - twoje pliki robocze</li>
+                        <li><strong>Staging Area (Index)</strong> - przygotowanie do commita</li>
+                        <li><strong>Local Repository</strong> - lokalna historia commitów</li>
+                        <li><strong>Remote Repository</strong> - zdalne repo (GitHub/GitLab)</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>Podstawowe komendy</h3>
+                    <pre><code class="bash"># Sprawdź status repozytorium
+git status
+
+# Dodaj plik do staging area
+git add plik.txt
+
+# Dodaj wszystkie zmienione pliki
+git add .
+
+# Utwórz commit
+git commit -m "Opis zmian"
+
+# Skrót: add + commit dla zmienionych plików
+git commit -am "Opis zmian"</code></pre>
+                </section>
+
+                <section>
+                    <h3>Conventional Commits</h3>
+                    <p>Konwencja nazywania commitów dla lepszej czytelności</p>
+                    <pre><code class="bash">feat: dodanie nowej funkcjonalności
+fix: naprawa błędu
+docs: zmiany w dokumentacji
+style: formatowanie kodu (bez zmian logiki)
+refactor: refaktoryzacja kodu
+test: dodanie lub modyfikacja testów
+chore: zmiany w konfiguracji, narzędziach</code></pre>
+                    <p class="small-text">Przykłady:</p>
+                    <pre><code class="bash">feat: add user authentication
+fix: resolve login timeout issue
+docs: update README with installation steps</code></pre>
+                </section>
+
+                <section>
+                    <h3>Praktyka: Pierwszy projekt</h3>
+                    <pre><code class="bash"># 1. Utwórz nowe repozytorium
+mkdir notatnik
+cd notatnik
+git init
+
+# 2. Utwórz pliki
+echo "# Mój Notatnik" > README.md
+echo "print('Hello, Git!')" > hello.py
+
+# 3. Sprawdź status (przed dodaniem)
+git status
+# On branch main
+# Untracked files:
+#   README.md
+#   hello.py
+
+# 4. Dodaj pliki do staging area
+git add .
+
+# 5. Sprawdź status (po dodaniu)
+git status
+# On branch main
+# Changes to be committed:
+#   new file:   README.md
+#   new file:   hello.py
+
+# 6. Utwórz commit
+git commit -m "feat: initial project setup"
+
+# 7. Sprawdź status (po commit)
+git status
+# On branch main
+# nothing to commit, working tree clean</code></pre>
+                </section>
+            </section>
+
+            <!-- Module 2: History Navigation -->
+            <section>
+                <section>
+                    <h2>Moduł 2: Poruszanie się w historii</h2>
+                    <p>Przeglądanie i analiza zmian</p>
+                </section>
+
+                <section>
+                    <h3>git log - Historia commitów</h3>
+                    <pre><code class="bash"># Podstawowy log
+git log
+
+# Kompaktowy widok
+git log --oneline
+
+# Z grafem gałęzi
+git log --oneline --graph --decorate
+
+# Z ostatnimi N commitami
+git log -n 5
+
+# Z datami
+git log --pretty=format:"%h - %an, %ar : %s"</code></pre>
+                </section>
+
+                <section>
+                    <h3>git show - Szczegóły commita</h3>
+                    <pre><code class="bash"># Pokaż ostatni commit
+git show
+
+# Pokaż konkretny commit
+git show abc1234
+
+# Pokaż konkretny plik z commita
+git show abc1234:plik.txt
+
+# Pokaż zmiany w konkretnym pliku
+git show HEAD:README.md</code></pre>
+                </section>
+
+                <section>
+                    <h3>git diff - Porównywanie zmian</h3>
+                    <pre><code class="bash"># Zmiany w working directory (niestaged)
+git diff
+
+# Zmiany w staging area
+git diff --staged
+# lub
+git diff --cached
+
+# Różnice między commitami
+git diff abc1234 def5678
+
+# Różnice w konkretnym pliku
+git diff HEAD README.md
+
+# Statystyki zmian
+git diff --stat</code></pre>
+                </section>
+
+                <section>
+                    <h3>Tagowanie wersji</h3>
+                    <p>Oznaczanie ważnych punktów w historii (np. release)</p>
+                    <pre><code class="bash"># Lightweight tag
+git tag v1.0.0
+
+# Annotated tag (z metadanymi)
+git tag -a v1.0.0 -m "Pierwsza stabilna wersja"
+
+# Lista tagów
+git tag
+
+# Szczegóły taga
+git show v1.0.0
+
+# Tagowanie starszego commita
+git tag -a v0.9.0 abc1234 -m "Beta version"
+
+# Wysłanie tagów na remote
+git push origin v1.0.0
+git push origin --tags</code></pre>
+                </section>
+            </section>
+
+            <!-- Module 3: .gitignore -->
+            <section>
+                <section>
+                    <h2>Moduł 3: .gitignore i ignorowanie plików</h2>
+                    <p>Ochrona wrażliwych danych i porządek w repo</p>
+                    <img src="images/vibe_code_env_meme.png" alt="Git .env meme" style="max-width: 60%; margin-top: 2rem; border-radius: 10px;">
+                </section>
+
+                <section>
+                    <h3>.gitignore - Ignorowanie plików</h3>
+                    <p>Pliki i foldery, które Git ma pomijać</p>
+                    <pre><code class="bash"># Przykładowy .gitignore
+
+# Zależności (virtual environment Python)
+venv/
+
+# Pliki IDE (Visual Studio Code)
+.vscode/
+
+# Pliki konfiguracyjne z sekretami
+.env
+credentials.json</code></pre>
+                    <p class="small-text">💡 Można robić bardziej skomplikowane wzorce (*.log, **/*.pyc, !important.log), ale wystarczy o to ChatGPT poprosić</p>
+                    <p class="small-text">Generator: <a href="https://gitignore.io">gitignore.io</a></p>
+                </section>
+
+                <section style="font-size: 0.75em;">
+                    <h3>Praktyka: .gitignore z credentials</h3>
+                    <p class="small-text">⚠️ Nigdy nie commituj plików z hasłami i kluczami API!</p>
+                    <pre><code class="bash"># 1. Utwórz plik z wrażliwymi danymi
+echo '{"api_key": "secret123", "password": "admin"}' > credentials.json
+
+# 2. Sprawdź status
+git status</code></pre>
+                    <div class="git-status-output">
+On branch <span class="branch-name">main</span><br>
+Untracked files:<br>
+  <span class="hint">(use "git add &lt;file&gt;..." to include in what will be committed)</span><br>
+        <span class="untracked">credentials.json</span>
+                    </div>
+                    <pre><code class="bash"># 3. Utwórz .gitignore
+echo "credentials.json" > .gitignore
+
+# 4. Sprawdź status ponownie
+git status</code></pre>
+                    <div class="git-status-output">
+On branch <span class="branch-name">main</span><br>
+Untracked files:<br>
+  <span class="hint">(use "git add &lt;file&gt;..." to include in what will be committed)</span><br>
+        <span class="untracked">.gitignore</span>
+                    </div>
+                    <pre><code class="bash"># 5. Dodaj .gitignore do repo (ale NIE credentials.json!)
+git add .gitignore
+git commit -m "chore: add .gitignore for credentials"</code></pre>
+                    <p class="small-text">✅ Teraz credentials.json jest bezpiecznie zignorowany przez Git</p>
+                </section>
+            </section>
+
+            <!-- Module 4: Branches -->
+            <section>
+                <section>
+                    <h2>Moduł 4: Praca z gałęziami</h2>
+                    <p>Równoległa praca nad funkcjonalnościami</p>
+                </section>
+
+                <section style="font-size: 0.85em;">
+                    <h3>Koncepcja branchy</h3>
+                    <p>Branch = wskaźnik do commita</p>
+                    <img src="https://git-scm.com/book/en/v2/images/advance-master.png" alt="Git Branches" style="max-height: 350px;">
+                    <ul class="small-text">
+                        <li>Lekkie i szybkie (tylko wskaźnik)</li>
+                        <li>Umożliwiają równoległą pracę</li>
+                        <li>Izolują zmiany od głównego kodu</li>
+                        <li>Główna gałąź: <code>main</code> lub <code>master</code></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Operacje na gałęziach</h3>
+                    <pre><code class="bash"># Wyświetl gałęzie
+git branch
+
+# Utwórz nową gałąź
+git branch feature-login
+
+# Przełącz się na gałąź
+git switch feature-login
+# lub (starszy sposób)
+git checkout feature-login
+
+# Utwórz i przełącz się (skrót)
+git switch -c feature-login
+# lub
+git checkout -b feature-login
+
+# Usuń gałąź
+git branch -d feature-login
+# Wymuś usunięcie (niescalone zmiany)
+git branch -D feature-login</code></pre>
+                </section>
+
+                <section>
+                    <h3>git merge - Scalanie gałęzi</h3>
+                    <div class="two-columns small-text">
+                        <div>
+                            <h4>Fast-forward</h4>
+                            <p>Brak nowych commitów na głównej gałęzi</p>
+                            <pre><code class="bash">git switch main
+git merge feature-login</code></pre>
+                            <img src="https://git-scm.com/book/en/v2/images/basic-branching-4.png" alt="Fast-forward" style="max-width: 100%;">
+                        </div>
+                        <div>
+                            <h4>True merge (3-way)</h4>
+                            <p>Nowe commity na obu gałęziach</p>
+                            <pre><code class="bash">git switch main
+git merge feature-login</code></pre>
+                            <img src="https://git-scm.com/book/en/v2/images/basic-merging-2.png" alt="3-way merge" style="max-width: 100%;">
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Konfllikty merge</h3>
+                    <p>Gdy Git nie może automatycznie scalić zmian</p>
+                    <pre><code class="bash"># Podczas merge pojawia się konflikt
+git merge feature-login
+# Auto-merging file.txt
+# CONFLICT (content): Merge conflict in file.txt
+
+# Plik z konfliktem wygląda tak:
+<<<<<<< HEAD
+Zmiana z głównej gałęzi
+=======
+Zmiana z feature branch
+>>>>>>> feature-login
+
+# 1. Edytuj plik i rozwiąż konflikt
+# 2. Dodaj rozwiązane pliki
+git add file.txt
+# 3. Dokończ merge
+git commit</code></pre>
+                </section>
+
+                <section>
+                    <h3>Ćwiczenie: Feature branch</h3>
+                    <pre><code class="bash"># 1. Utwórz nową gałąź dla funkcjonalności
+git switch -c feature-user-profile
+
+# 2. Wprowadź zmiany
+echo "def get_user_profile(): pass" >> user.py
+git add user.py
+git commit -m "feat: add user profile function"
+
+# 3. Wróć na main
+git switch main
+
+# 4. Scal zmiany
+git merge feature-user-profile
+
+# 5. Usuń niepotrzebną gałąź
+git branch -d feature-user-profile</code></pre>
+                </section>
+            </section>
+
+            <!-- Module 5: Remote Repositories -->
+            <section>
+                <section>
+                    <h2>Moduł 5: Zdalne repozytoria</h2>
+                    <p>Współpraca przez GitHub/GitLab</p>
+                </section>
+
+                <section>
+                    <h3>git remote - Zarządzanie zdalnymi repozytoriami</h3>
+                    <pre><code class="bash"># Dodaj zdalne repozytorium
+git remote add origin https://github.com/user/repo.git
+
+# Wyświetl zdalne repozytoria
+git remote -v
+
+# Zmień URL zdalnego repo
+git remote set-url origin git@github.com:user/repo.git
+
+# Usuń zdalne repo
+git remote remove origin
+
+# Zmień nazwę
+git remote rename origin upstream</code></pre>
+                </section>
+
+                <section>
+                    <h3>Push, Fetch, Pull</h3>
+                    <pre><code class="bash"># PUSH - wyślij lokalne zmiany na remote
+git push origin main
+
+# Ustaw tracking dla gałęzi
+git push -u origin feature-login
+
+# FETCH - pobierz zmiany (bez merge)
+git fetch origin
+
+# PULL - pobierz i scal zmiany (fetch + merge)
+git pull origin main
+
+# Pull z rebase zamiast merge
+git pull --rebase origin main</code></pre>
+                </section>
+
+                <section>
+                    <h3>Fork vs Clone</h3>
+                    <div class="two-columns small-text">
+                        <div>
+                            <h4>Clone</h4>
+                            <ul>
+                                <li>Kopiuje repo lokalnie</li>
+                                <li>Bezpośredni dostęp do oryginalnego repo</li>
+                                <li>Wymaga uprawnień do push</li>
+                                <li>Dla projektów zespołowych</li>
+                            </ul>
+                            <pre><code class="bash">git clone https://github.com/team/project.git</code></pre>
+                        </div>
+                        <div>
+                            <h4>Fork</h4>
+                            <ul>
+                                <li>Tworzy kopię repo na Twoim koncie</li>
+                                <li>Niezależna kopia na GitHub/GitLab</li>
+                                <li>Pełna kontrola nad swoją kopią</li>
+                                <li>Dla projektów open source</li>
+                            </ul>
+                            <pre><code class="bash"># Fork przez interfejs GitHub
+# Potem clone swojej kopii
+git clone https://github.com/YOU/project.git</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Pull Request (PR) / Merge Request (MR)</h3>
+                    <p class="small-text">Sposób na wniesienie zmian do projektu</p>
+                    <ol class="small-text">
+                        <li><strong>Utwórz branch</strong> dla swojej funkcjonalności</li>
+                        <li><strong>Wprowadź zmiany</strong> i commituj</li>
+                        <li><strong>Push na remote</strong></li>
+                        <li><strong>Otwórz PR/MR</strong> przez interfejs GitHub/GitLab</li>
+                        <li><strong>Code Review</strong> - inni sprawdzają kod</li>
+                        <li><strong>Status Checks</strong> - automatyczne testy, lintery</li>
+                        <li><strong>Merge</strong> - po akceptacji</li>
+                    </ol>
+                    <p class="small-text">🎯 <strong>Dobry PR:</strong> mały, skupiony, z jasnym opisem, przechodzi testy</p>
+                </section>
+
+                <section style="font-size: 0.7em;">
+                    <h3>Przykład: Duże repozytorium Open Source</h3>
+                    <p class="small-text">Jak wyglądają PR/MR w prawdziwych projektach</p>
+                    <div class="small-text">
+                        <p><strong>Przykładowe repozytoria do zbadania:</strong></p>
+                        <ul>
+                            <li>🐍 <strong>Python:</strong> <a href="https://github.com/python/cpython/pulls">github.com/python/cpython</a></li>
+                            <li>⚛️ <strong>React:</strong> <a href="https://github.com/facebook/react/pulls">github.com/facebook/react</a></li>
+                            <li>🦀 <strong>Rust:</strong> <a href="https://github.com/rust-lang/rust/pulls">github.com/rust-lang/rust</a></li>
+                            <li>🐧 <strong>Linux:</strong> <a href="https://github.com/torvalds/linux/pulls">github.com/torvalds/linux</a></li>
+                            <li>🤖 <strong>Robocorp (submodules):</strong> <a href="https://github.com/robocorp/example-use-git-submodule-for-shared-code">github.com/robocorp/example-use-git-submodule-for-shared-code</a></li>
+                            <li>🐍 <strong>Python Repo:</strong> <a href="https://github.com/kennethreitz/python-guide">github.com/kennethreitz/python-guide</a></li>
+                        </ul>
+                        <p style="margin-top: 1rem;"><strong>Co zauważyć:</strong></p>
+                        <ul>
+                            <li>Szczegółowe opisy PR z motywacją zmian</li>
+                            <li>Testy automatyczne (CI/CD) - muszą przejść</li>
+                            <li>Code review - kilka osób sprawdza kod</li>
+                            <li>Dyskusje w komentarzach</li>
+                            <li>Labels (bug, enhancement, documentation)</li>
+                            <li>Link do Issue, które PR rozwiązuje</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Branch Protection Rules</h3>
+                    <p class="small-text">Ochrona głównych gałęzi (GitHub/GitLab settings)</p>
+                    <ul class="small-text">
+                        <li>✅ <strong>Require pull request reviews</strong> - wymagaj akceptacji przed merge</li>
+                        <li>✅ <strong>Require status checks</strong> - testy muszą przejść</li>
+                        <li>✅ <strong>Require branches to be up to date</strong> - branch musi być zaktualizowany</li>
+                        <li>✅ <strong>Require linear history</strong> - zakaż merge commitów</li>
+                        <li>✅ <strong>Include administrators</strong> - zasady dotyczą też adminów</li>
+                        <li>🚫 <strong>Restrict push</strong> - tylko wybrane osoby mogą pushować</li>
+                    </ul>
+                </section>
+
+                <section style="font-size: 0.5em;">
+                    <h3>Branch Protection - Ochrona głównej gałęzi</h3>
+                    <p class="small-text">Zabezpiecz main przed przypadkowym pushem (GitHub/GitLab)</p>
+                    <img src="images/master.png" alt="Branch protection meme" style="max-width: 50%; margin-top: 0.3rem; border-radius: 10px;">
+                    <div class="small-text">
+                        <p style="margin-top: 0.3rem; margin-bottom: 0.2rem;"><strong>GitHub Settings → Branches → Add rule:</strong></p>
+                        <ul style="margin-top: 0; margin-bottom: 0.3rem;">
+                            <li>✅ Branch name pattern: <code>main</code></li>
+                            <li>✅ Require pull request before merging</li>
+                            <li>✅ Require approvals (1 lub więcej)</li>
+                            <li>✅ Require status checks to pass</li>
+                            <li>✅ Do not allow bypassing (nawet dla adminów)</li>
+                        </ul>
+                        <p style="margin-top: 0.3rem; margin-bottom: 0.2rem;"><strong>GitLab Settings → Repository → Protected Branches:</strong></p>
+                        <ul style="margin-top: 0; margin-bottom: 0.3rem;">
+                            <li>Branch: <code>main</code></li>
+                            <li>Allowed to merge: Maintainers</li>
+                            <li>Allowed to push: No one</li>
+                        </ul>
+                        <p style="margin-top: 0.3rem;">🛡️ Teraz nikt (nawet Ty) nie może bezpośrednio pushować do main!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Workflow z PR</h3>
+                    <pre><code class="bash"># 1. Utwórz feature branch
+git switch -c feature-new-api
+
+# 2. Wprowadź zmiany i commituj
+git add .
+git commit -m "feat: implement new API endpoint"
+
+# 3. Push do remote
+git push -u origin feature-new-api
+
+# 4. Na GitHub/GitLab: utwórz Pull Request
+# 5. Code review, testy, poprawki...
+# 6. Po akceptacji: merge przez interfejs
+
+# 7. Lokalnie: zaktualizuj main i usuń branch
+git switch main
+git pull origin main
+git branch -d feature-new-api</code></pre>
+                </section>
+            </section>
+
+            <!-- Module 6: Undoing and Fixing -->
+            <section>
+                <section>
+                    <h2>Moduł 6: Cofanie i naprawianie</h2>
+                    <p>Jak naprawić błędy w Git</p>
+                </section>
+
+                <section style="font-size: 0.85em;">
+                    <h3>git checkout - Cofanie do commita</h3>
+                    <p class="small-text">Najpierw sprawdź historię commitów:</p>
+                    <pre><code class="bash">git log --oneline</code></pre>
+                    <div class="git-log-output">
+<span class="commit-hash">a1b2c3d</span> <span class="branch-head">(HEAD -> main)</span> <span class="commit-message">fix: naprawiono błąd w loginie</span><br>
+<span class="commit-hash">e4f5g6h</span> <span class="commit-message">feat: dodano formularz rejestracji</span><br>
+<span class="commit-hash">i7j8k9l</span> <span class="commit-message">feat: utworzono stronę główną</span><br>
+<span class="commit-hash">m0n1o2p</span> <span class="commit-message">feat: initial project setup</span>
+                    </div>
+                    <pre><code class="bash"># Cofnij zmiany do ostatniego commita (HEAD)
+git checkout HEAD plik.txt
+
+# Cofnij do konkretnego commita (użyj SHA z git log)
+git checkout e4f5g6h plik.txt
+
+# Cofnij wszystkie pliki
+git checkout HEAD .
+
+# Nowa składnia (preferowana)
+git restore plik.txt
+git restore --source=e4f5g6h plik.txt</code></pre>
+                    <p class="small-text">⚠️ <strong>Uwaga:</strong> Traci niezapisane zmiany!</p>
+                </section>
+
+                <section style="font-size: 0.7em;">
+                    <h3>Staging Area - Dodawanie plików</h3>
+                    <p class="small-text">Zobaczmy jak działa staging area</p>
+                    <pre><code class="bash"># 1. Zmodyfikuj pliki
+echo "new code" >> app.py
+echo "new config" >> config.json
+
+# 2. Sprawdź status (przed dodaniem)
+git status</code></pre>
+                    <div class="git-status-output">
+On branch <span class="branch-name">main</span><br>
+Changes not staged for commit:<br>
+  <span class="hint">(use "git add &lt;file&gt;..." to update what will be committed)</span><br>
+        <span class="modified">modified:   app.py</span><br>
+        <span class="modified">modified:   config.json</span>
+                    </div>
+                    <pre><code class="bash"># 3. Dodaj do staging
+git add .
+
+# 4. Sprawdź status (po dodaniu)
+git status</code></pre>
+                    <div class="git-status-output">
+On branch <span class="branch-name">main</span><br>
+Changes to be committed:<br>
+  <span class="hint">(use "git restore --staged &lt;file&gt;..." to unstage)</span><br>
+        <span class="staged">modified:   app.py</span><br>
+        <span class="staged">modified:   config.json</span>
+                    </div>
+                </section>
+
+                <section style="font-size: 0.7em;">
+                    <h3>git reset HEAD - Usuwanie ze staging</h3>
+                    <p class="small-text">Cofnij pliki ze staging area (zmiany w plikach pozostają!)</p>
+                    <pre><code class="bash"># Status przed reset (pliki w staging)
+git status</code></pre>
+                    <div class="git-status-output">
+On branch <span class="branch-name">main</span><br>
+Changes to be committed:<br>
+  <span class="hint">(use "git restore --staged &lt;file&gt;..." to unstage)</span><br>
+        <span class="staged">modified:   app.py</span><br>
+        <span class="staged">modified:   config.json</span>
+                    </div>
+                    <pre><code class="bash"># Usuń jeden plik ze staging
+git reset HEAD app.py
+
+# Sprawdź status (po reset)
+git status</code></pre>
+                    <div class="git-status-output">
+On branch <span class="branch-name">main</span><br>
+Changes to be committed:<br>
+        <span class="staged">modified:   config.json</span><br>
+<br>
+Changes not staged for commit:<br>
+  <span class="hint">(use "git add &lt;file&gt;..." to update what will be committed)</span><br>
+        <span class="modified">modified:   app.py</span>
+                    </div>
+                    <pre><code class="bash"># Nowa składnia (preferowana)
+git restore --staged app.py</code></pre>
+                    <p class="small-text">💡 Zmiany w plikach pozostają, tylko staging area jest czyszczony</p>
+                </section>
+
+                <section>
+                    <h3>git reset --hard</h3>
+                    <p>Cofnij commity i usuń wszystkie zmiany</p>
+                    <pre><code class="bash"># Cofnij do poprzedniego commita (traci zmiany!)
+git reset --hard HEAD~1
+
+# Cofnij do konkretnego commita
+git reset --hard abc1234
+
+# Cofnij wszystkie lokalne zmiany
+git reset --hard HEAD</code></pre>
+                    <p class="small-text">⚠️ <strong>UWAGA:</strong> Bezpowrotnie usuwa zmiany!</p>
+                    <p class="small-text">🚫 Nigdy nie używaj na publicznych commitach (po push)</p>
+                </section>
+
+                <section>
+                    <h3>Rodzaje reset</h3>
+                    <div class="small-text">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Komenda</th>
+                                    <th>Working Directory</th>
+                                    <th>Staging Area</th>
+                                    <th>Commits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>git reset --soft</code></td>
+                                    <td>Zachowane</td>
+                                    <td>Zachowane</td>
+                                    <td>Cofnięte</td>
+                                </tr>
+                                <tr>
+                                    <td><code>git reset --mixed</code> (domyślny)</td>
+                                    <td>Zachowane</td>
+                                    <td>Wyczyszczone</td>
+                                    <td>Cofnięte</td>
+                                </tr>
+                                <tr>
+                                    <td><code>git reset --hard</code></td>
+                                    <td>Wyczyszczone</td>
+                                    <td>Wyczyszczone</td>
+                                    <td>Cofnięte</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Inne przydatne komendy</h3>
+                    <pre><code class="bash"># Popraw ostatni commit (zmień wiadomość lub dodaj pliki)
+git commit --amend
+
+# Usuń ostatni commit, ale zachowaj zmiany
+git reset --soft HEAD~1
+
+# Cofnij merge
+git merge --abort</code></pre>
+                </section>
+            </section>
+
+            <!-- Module 7: Advanced Topics -->
+            <section>
+                <section>
+                    <h2>Moduł 7: Dodatkowo</h2>
+                    <p>Zaawansowane techniki (jeśli starczy czasu)</p>
+                </section>
+
+                <section>
+                    <h3>Pre-commit Hooks</h3>
+                    <p class="small-text">Automatyczne sprawdzenia przed commitem</p>
+                    <pre><code class="bash"># Instalacja pre-commit (Python)
+pip install pre-commit
+
+# Konfiguracja: .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+# Instalacja hooków
+pre-commit install
+
+# Teraz przy każdym commit automatycznie uruchomią się sprawdzenia!</code></pre>
+                </section>
+
+                <section style="font-size: 0.65em;">
+                    <h3>Git Submodules</h3>
+                    <p class="small-text">Zarządzanie zależnościami jako repozytoriami</p>
+                    <pre><code class="bash"># Dodaj submoduł
+git submodule add https://github.com/user/library.git libs/library
+
+# Clone repo z submodułami
+git clone --recursive https://github.com/user/project.git
+
+# Lub po clone:
+git submodule init
+git submodule update
+
+# Aktualizuj submoduły
+git submodule update --remote
+
+# Usuń submoduł
+git submodule deinit libs/library
+git rm libs/library</code></pre>
+                    <p class="small-text">💡 <strong>Alternatywa:</strong> package managers - instalacja bezpośrednio z Git repo</p>
+                    <pre><code class="bash"># Python (pip)
+pip install git+https://github.com/user/library.git
+
+# Node.js (npm)
+npm install git+https://github.com/user/library.git
+
+# Rust (Cargo.toml)
+[dependencies]
+library = { git = "https://github.com/user/library.git" }</code></pre>
+                    <p class="small-text">📚 <strong>Przykład użycia submodules:</strong> <a href="https://github.com/robocorp/example-use-git-submodule-for-shared-code">robocorp/example-use-git-submodule-for-shared-code</a></p>
+                </section>
+
+                <section>
+                    <h3>git stash - Tymczasowe schowanie zmian</h3>
+                    <p class="small-text">Przydatne gdy musisz szybko zmienić branch, ale nie chcesz commitować</p>
+                    <pre><code class="bash"># Schowaj zmiany z nazwą (zalecane!)
+git stash push -m "work in progress on feature X"
+
+# Zobacz listę schowanych zmian
+git stash list
+# stash@{0}: On main: work in progress on feature X
+# stash@{1}: On feature-login: debugging auth
+
+# Przywróć konkretny stash
+git stash apply stash@{0}
+
+# Przywróć i usuń z listy
+git stash pop stash@{0}
+
+# Usuń stash
+git stash drop stash@{0}</code></pre>
+                    <p class="small-text">💡 <strong>Alternatywa:</strong> <code>git worktree</code> - pozwala pracować na wielu branch'ach jednocześnie w osobnych folderach (zaawansowane)</p>
+                </section>
+
+                <section>
+                    <h3>git cherry-pick - Przeniesienie commita</h3>
+                    <p class="small-text">Skopiuj konkretny commit z innej gałęzi</p>
+                    <pre><code class="bash"># Sytuacja: masz commit abc1234 na gałęzi feature,
+# ale chcesz go mieć też na main
+
+# 1. Znajdź hash commita (np. z git log)
+git log --oneline feature
+# abc1234 fix: naprawiono krytyczny bug
+
+# 2. Przełącz się na gałąź docelową
+git switch main
+
+# 3. Cherry-pick konkretnego commita
+git cherry-pick abc1234
+
+# Commit został skopiowany na main!</code></pre>
+                </section>
+
+                <section>
+                    <h3>git blame - Kto zmienił kod?</h3>
+                    <p class="small-text">Sprawdź kto i kiedy modyfikował każdą linię</p>
+                    <pre><code class="bash"># Zobacz autora każdej linii w pliku
+git blame app.py
+
+# Output:
+# abc12345 (Jan Kowalski 2024-01-15 10:30:00) def calculate():
+# def56789 (Anna Nowak   2024-02-20 14:45:00)     result = x + y
+# ghi01234 (Jan Kowalski 2024-03-01 09:15:00)     return result
+
+# Pokaż tylko linie 10-20
+git blame -L 10,20 app.py
+
+# Ignoruj zmiany białych znaków
+git blame -w app.py</code></pre>
+                    <p class="small-text">💡 Przydatne gdy szukasz autora konkretnego kodu lub bug</p>
+                    <p class="small-text">🔧 <strong>W VS Code:</strong> Możesz użyć dodatku <strong>GitLens</strong> - pokazuje autora w każdej linii kodu bez komend!</p>
+                </section>
+
+                <section>
+                    <h3>Git Aliases - Skróty komend</h3>
+                    <p class="small-text">Stwórz własne skróty dla często używanych komend</p>
+                    <pre><code class="bash"># Utwórz alias dla git status
+git config --global alias.st status
+
+# Teraz możesz użyć:
+git st
+# zamiast: git status
+
+# Więcej przydatnych aliasów:
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.last 'log -1 HEAD'
+git config --global alias.unstage 'reset HEAD --'
+
+# Przykłady użycia:
+git co main          # git checkout main
+git br               # git branch
+git last             # git log -1 HEAD
+git unstage file.txt # git reset HEAD -- file.txt</code></pre>
+                </section>
+
+                <section>
+                    <h3>git rm - Usuwanie plików z repo</h3>
+                    <p class="small-text">Usuń plik z repozytorium Git</p>
+                    <pre><code class="bash"># Usuń plik z repo i working directory
+git rm file.txt
+git commit -m "chore: remove file.txt"
+
+# Usuń tylko z repo, ale zostaw lokalnie
+git rm --cached file.txt
+git commit -m "chore: stop tracking file.txt"
+
+# Przydatne gdy przypadkowo dodałeś .env do repo:
+git rm --cached .env
+echo ".env" >> .gitignore
+git add .gitignore
+git commit -m "chore: remove .env from tracking"
+
+# Usuń cały folder
+git rm -r old_folder/
+git commit -m "chore: remove old folder"</code></pre>
+                </section>
+
+                <section>
+                    <h3>Inne przydatne narzędzia</h3>
+                    <ul class="small-text">
+                        <li><strong>GitHub Actions / GitLab CI</strong> - automatyzacja testów i deploymentu</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Git Cheat Sheet -->
+            <section>
+                <section>
+                    <h2>Git Cheat Sheet</h2>
+                    <p>Najważniejsze komendy</p>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Konfiguracja i tworzenie</h3>
+                    <table>
+                        <tr>
+                            <td><code>git config --global user.name "Name"</code></td>
+                            <td>Ustaw nazwę użytkownika</td>
+                        </tr>
+                        <tr>
+                            <td><code>git config --global user.email "email"</code></td>
+                            <td>Ustaw email</td>
+                        </tr>
+                        <tr>
+                            <td><code>git init</code></td>
+                            <td>Utwórz nowe repozytorium</td>
+                        </tr>
+                        <tr>
+                            <td><code>git clone &lt;url&gt;</code></td>
+                            <td>Sklonuj istniejące repozytorium</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Podstawowe operacje</h3>
+                    <table>
+                        <tr>
+                            <td><code>git status</code></td>
+                            <td>Sprawdź status plików</td>
+                        </tr>
+                        <tr>
+                            <td><code>git add &lt;file&gt;</code></td>
+                            <td>Dodaj plik do staging</td>
+                        </tr>
+                        <tr>
+                            <td><code>git add .</code></td>
+                            <td>Dodaj wszystkie zmienione pliki</td>
+                        </tr>
+                        <tr>
+                            <td><code>git commit -m "message"</code></td>
+                            <td>Utwórz commit</td>
+                        </tr>
+                        <tr>
+                            <td><code>git commit -am "message"</code></td>
+                            <td>Add + commit (tylko zmienione)</td>
+                        </tr>
+                        <tr>
+                            <td><code>git commit --amend</code></td>
+                            <td>Popraw ostatni commit</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Gałęzie (Branches)</h3>
+                    <table>
+                        <tr>
+                            <td><code>git branch</code></td>
+                            <td>Lista gałęzi</td>
+                        </tr>
+                        <tr>
+                            <td><code>git branch &lt;name&gt;</code></td>
+                            <td>Utwórz nową gałąź</td>
+                        </tr>
+                        <tr>
+                            <td><code>git switch &lt;branch&gt;</code></td>
+                            <td>Przełącz się na gałąź</td>
+                        </tr>
+                        <tr>
+                            <td><code>git switch -c &lt;branch&gt;</code></td>
+                            <td>Utwórz i przełącz na gałąź</td>
+                        </tr>
+                        <tr>
+                            <td><code>git merge &lt;branch&gt;</code></td>
+                            <td>Scal gałąź z bieżącą</td>
+                        </tr>
+                        <tr>
+                            <td><code>git branch -d &lt;branch&gt;</code></td>
+                            <td>Usuń gałąź</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Historia i różnice</h3>
+                    <table>
+                        <tr>
+                            <td><code>git log</code></td>
+                            <td>Pokaż historię commitów</td>
+                        </tr>
+                        <tr>
+                            <td><code>git log --oneline --graph</code></td>
+                            <td>Kompaktowy log z grafem</td>
+                        </tr>
+                        <tr>
+                            <td><code>git show &lt;commit&gt;</code></td>
+                            <td>Pokaż szczegóły commita</td>
+                        </tr>
+                        <tr>
+                            <td><code>git diff</code></td>
+                            <td>Różnice w working directory</td>
+                        </tr>
+                        <tr>
+                            <td><code>git diff --staged</code></td>
+                            <td>Różnice w staging area</td>
+                        </tr>
+                        <tr>
+                            <td><code>git diff &lt;commit1&gt; &lt;commit2&gt;</code></td>
+                            <td>Różnice między commitami</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Zdalne repozytoria</h3>
+                    <table>
+                        <tr>
+                            <td><code>git remote add origin &lt;url&gt;</code></td>
+                            <td>Dodaj zdalne repo</td>
+                        </tr>
+                        <tr>
+                            <td><code>git remote -v</code></td>
+                            <td>Lista zdalnych repo</td>
+                        </tr>
+                        <tr>
+                            <td><code>git push origin &lt;branch&gt;</code></td>
+                            <td>Wyślij zmiany na remote</td>
+                        </tr>
+                        <tr>
+                            <td><code>git push -u origin &lt;branch&gt;</code></td>
+                            <td>Push z ustawieniem tracking</td>
+                        </tr>
+                        <tr>
+                            <td><code>git fetch</code></td>
+                            <td>Pobierz zmiany (bez merge)</td>
+                        </tr>
+                        <tr>
+                            <td><code>git pull</code></td>
+                            <td>Pobierz i scal zmiany</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Cofanie i naprawianie</h3>
+                    <table>
+                        <tr>
+                            <td><code>git restore &lt;file&gt;</code></td>
+                            <td>Cofnij zmiany w pliku</td>
+                        </tr>
+                        <tr>
+                            <td><code>git restore --staged &lt;file&gt;</code></td>
+                            <td>Usuń plik ze staging</td>
+                        </tr>
+                        <tr>
+                            <td><code>git reset HEAD~1</code></td>
+                            <td>Cofnij ostatni commit (zachowaj zmiany)</td>
+                        </tr>
+                        <tr>
+                            <td><code>git reset --hard HEAD~1</code></td>
+                            <td>Cofnij commit i usuń zmiany</td>
+                        </tr>
+                        <tr>
+                            <td><code>git revert &lt;commit&gt;</code></td>
+                            <td>Cofnij commit (nowy commit)</td>
+                        </tr>
+                        <tr>
+                            <td><code>git reflog</code></td>
+                            <td>Historia wszystkich operacji</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Przydatne dodatki</h3>
+                    <table>
+                        <tr>
+                            <td><code>git stash</code></td>
+                            <td>Schowaj zmiany tymczasowo</td>
+                        </tr>
+                        <tr>
+                            <td><code>git stash pop</code></td>
+                            <td>Przywróć schowane zmiany</td>
+                        </tr>
+                        <tr>
+                            <td><code>git tag &lt;name&gt;</code></td>
+                            <td>Utwórz tag</td>
+                        </tr>
+                        <tr>
+                            <td><code>git tag -a &lt;name&gt; -m "msg"</code></td>
+                            <td>Utwórz annotated tag</td>
+                        </tr>
+                        <tr>
+                            <td><code>git cherry-pick &lt;commit&gt;</code></td>
+                            <td>Przenieś konkretny commit</td>
+                        </tr>
+                        <tr>
+                            <td><code>git blame &lt;file&gt;</code></td>
+                            <td>Kto zmienił każdą linię</td>
+                        </tr>
+                    </table>
+                </section>
+            </section>
+
+            <!-- Final Slide -->
+            <section>
+                <h2>Dziękuję!</h2>
+                <p>Pytania?</p>
+                <br>
+                <p class="small-text">📚 Materiały dodatkowe:</p>
+                <ul class="small-text">
+                    <li><a href="https://git-scm.com/doc">Oficjalna dokumentacja Git</a></li>
+                    <li><a href="https://learngitbranching.js.org/">Learn Git Branching (interaktywny tutorial)</a></li>
+                    <li><a href="https://www.conventionalcommits.org/">Conventional Commits</a></li>
+                    <li><a href="https://gitignore.io">gitignore.io</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            plugins: [ RevealHighlight, RevealNotes ],
+            slideNumber: true,
+            transition: 'slide',
+            backgroundTransition: 'fade'
+        });
+    </script>
+</body>
+</html>
