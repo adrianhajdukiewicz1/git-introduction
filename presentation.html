@@ -449,13 +449,14 @@ git commit -m "chore: add .gitignore for credentials"</code></pre>
 
                 <section style="font-size: 0.85em;">
                     <h3>Koncepcja branchy</h3>
-                    <p>Branch = wskaźnik do commita</p>
-                    <img src="https://git-scm.com/book/en/v2/images/advance-master.png" alt="Git Branches" style="max-height: 350px;">
+                    <p><strong>Nowy <code>branch</code> = odejście od głównej linii rozwoju projektu</strong></p>
+                    <img src="images/branches.png" alt="Git Branches" style="max-height: 300px;">
+                    <p style="font-size: 0.5em; margin-top: 0.5em;">source: https://www.optimizely.com/optimization-glossary/trunk-based-development</p>
                     <ul class="small-text">
-                        <li>Lekkie i szybkie (tylko wskaźnik)</li>
-                        <li>Umożliwiają równoległą pracę</li>
-                        <li>Izolują zmiany od głównego kodu</li>
-                        <li>Główna gałąź: <code>main</code> lub <code>master</code></li>
+                        <li>Tworzysz kopię projektu, która rozwija się niezależnie</li>
+                        <li>Możesz pracować i eksperymentować bez wpływu na główną gałąź (<code>main</code>)</li>
+                        <li>Zmiany w branchu nie zmieniają oryginalnej gałęzi <code>main</code></li>
+                        <li>Gdy skończysz - scalasz (merge) zmiany z powrotem do <code>main</code></li>
                     </ul>
                 </section>
 
@@ -642,7 +643,6 @@ git clone https://github.com/YOU/project.git</code></pre>
                             <li>⚛️ <strong>React:</strong> <a href="https://github.com/facebook/react/pulls">github.com/facebook/react</a></li>
                             <li>🦀 <strong>Rust:</strong> <a href="https://github.com/rust-lang/rust/pulls">github.com/rust-lang/rust</a></li>
                             <li>🐧 <strong>Linux:</strong> <a href="https://github.com/torvalds/linux/pulls">github.com/torvalds/linux</a></li>
-                            <li>🤖 <strong>Robocorp (submodules):</strong> <a href="https://github.com/robocorp/example-use-git-submodule-for-shared-code">github.com/robocorp/example-use-git-submodule-for-shared-code</a></li>
                             <li>🐍 <strong>Python Repo:</strong> <a href="https://github.com/kennethreitz/python-guide">github.com/kennethreitz/python-guide</a></li>
                         </ul>
                         <p style="margin-top: 1rem;"><strong>Co zauważyć:</strong></p>
@@ -1229,6 +1229,42 @@ git commit -m "chore: remove old folder"</code></pre>
                 </section>
 
                 <section class="cheat-sheet">
+                    <h3>.gitignore</h3>
+                    <table>
+                        <tr>
+                            <td><code>echo "*.log" >> .gitignore</code></td>
+                            <td>Ignoruj pliki .log</td>
+                        </tr>
+                        <tr>
+                            <td><code>echo "node_modules/" >> .gitignore</code></td>
+                            <td>Ignoruj katalog</td>
+                        </tr>
+                        <tr>
+                            <td><code>echo ".env" >> .gitignore</code></td>
+                            <td>Ignoruj pliki z sekretami</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>SSH i bezpieczeństwo</h3>
+                    <table>
+                        <tr>
+                            <td><code>ssh-keygen -t ed25519 -C "email"</code></td>
+                            <td>Generuj klucz SSH</td>
+                        </tr>
+                        <tr>
+                            <td><code>cat ~/.ssh/id_ed25519.pub</code></td>
+                            <td>Wyświetl klucz publiczny</td>
+                        </tr>
+                        <tr>
+                            <td><code>ssh-add ~/.ssh/id_ed25519</code></td>
+                            <td>Dodaj klucz do agenta SSH</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
                     <h3>Przydatne dodatki</h3>
                     <table>
                         <tr>
@@ -1236,8 +1272,20 @@ git commit -m "chore: remove old folder"</code></pre>
                             <td>Schowaj zmiany tymczasowo</td>
                         </tr>
                         <tr>
+                            <td><code>git stash push -m "message"</code></td>
+                            <td>Schowaj z nazwą</td>
+                        </tr>
+                        <tr>
+                            <td><code>git stash list</code></td>
+                            <td>Lista schowanych zmian</td>
+                        </tr>
+                        <tr>
+                            <td><code>git stash apply stash@{0}</code></td>
+                            <td>Przywróć konkretny stash</td>
+                        </tr>
+                        <tr>
                             <td><code>git stash pop</code></td>
-                            <td>Przywróć schowane zmiany</td>
+                            <td>Przywróć ostatnie zmiany</td>
                         </tr>
                         <tr>
                             <td><code>git tag &lt;name&gt;</code></td>
@@ -1254,6 +1302,36 @@ git commit -m "chore: remove old folder"</code></pre>
                         <tr>
                             <td><code>git blame &lt;file&gt;</code></td>
                             <td>Kto zmienił każdą linię</td>
+                        </tr>
+                        <tr>
+                            <td><code>git rm &lt;file&gt;</code></td>
+                            <td>Usuń plik z repo i dysku</td>
+                        </tr>
+                        <tr>
+                            <td><code>git rm --cached &lt;file&gt;</code></td>
+                            <td>Usuń z repo (zachowaj na dysku)</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="cheat-sheet">
+                    <h3>Aliasy i konfiguracja</h3>
+                    <table>
+                        <tr>
+                            <td><code>git config --global alias.st status</code></td>
+                            <td>Utwórz alias (git st)</td>
+                        </tr>
+                        <tr>
+                            <td><code>git config --global alias.co checkout</code></td>
+                            <td>Alias dla checkout</td>
+                        </tr>
+                        <tr>
+                            <td><code>git config --global alias.br branch</code></td>
+                            <td>Alias dla branch</td>
+                        </tr>
+                        <tr>
+                            <td><code>git config --global alias.cm "commit -m"</code></td>
+                            <td>Alias dla commit -m</td>
                         </tr>
                     </table>
                 </section>
